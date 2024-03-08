@@ -68,27 +68,8 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', getPackage, async (req, res) => {
     try {
-        ['active_delivery_id', 'description', 'weight'].forEach(property => {
+        ['active_delivery_id', 'description', 'weight', 'dimensions', 'from', 'to'].forEach(property => {
             updatePropertyIfNotNull(req.body, res.package, property);
-        });
-
-        if (req.body.dimensions) {
-            ['width', 'height', 'depth'].forEach(property => {
-                updatePropertyIfNotNull(req.body.dimensions, res.package.dimensions, property);
-            });
-        }
-
-        ['from', 'to'].forEach(direction => {
-            if (req.body[direction]) {
-                updatePropertyIfNotNull(req.body[direction], res.package[direction], 'name');
-                updatePropertyIfNotNull(req.body[direction], res.package[direction], 'address');
-
-                if (req.body[direction].location) {
-                    ['lat', 'lng'].forEach(coord => {
-                        updatePropertyIfNotNull(req.body[direction].location, res.package[direction].location, coord);
-                    });
-                }
-            }
         });
 
         const updatedPackage = await res.package.save();
