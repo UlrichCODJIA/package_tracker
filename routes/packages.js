@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Package = require('../models/Package');
 
+const { updatePropertyIfNotNull } = require('./utils');
+
 // Get all packages
 router.get('/', async (req, res) => {
     try {
@@ -65,60 +67,30 @@ router.post('/', async (req, res) => {
 
 
 router.put('/:id', getPackage, async (req, res) => {
-    if (req.body.active_delivery_id != null) {
-        res.package.active_delivery_id = req.body.active_delivery_id;
-    }
-    if (req.body.description != null) {
-        res.package.description = req.body.description;
-    }
-    if (req.body.weight != null) {
-        res.package.weight = req.body.weight;
-    }
-    if (typeof req.body.dimensions == "undefined") {
-        if (req.body.dimensions.width != null) {
-            res.package.dimensions.width = req.body.dimensions.width;
-        }
-        else if (req.body.dimensions.height != null) {
-            res.package.dimensions.height = req.body.dimensions.height;
-        }
-        else if (req.body.dimensions.depth != null) {
-            res.package.dimensions.depth = req.body.dimensions.depth;
-        }
-    }
-    if (typeof req.body.from == "undefined") {
-        if (req.body.from.name != null) {
-            res.package.from.name = req.body.from.name;
-        }
-        else if (req.body.from.address != null) {
-            res.package.from.address = req.body.from.address;
-        }
-        if (typeof req.body.from.location == "undefined") {
-            if (req.body.from.location.lat != null) {
-                res.package.from.location.lat = req.body.from.location.lat;
-            }
-            else if (req.body.from.location.lng != null) {
-                res.package.from.location.lng = req.body.from.location.lng;
-            }
-        }
-    }
-    if (typeof req.body.to == "undefined") {
-        if (req.body.to.name != null) {
-            res.package.to.name = req.body.to.name;
-        }
-        else if (req.body.to.address != null) {
-            res.package.to.address = req.body.to.address;
-        }
-        if (typeof req.body.to.location == "undefined") {
-            if (req.body.to.location.lat != null) {
-                res.package.to.location.lat = req.body.to.location.lat;
-            }
-            else if (req.body.to.location.lng != null) {
-                res.package.to.location.lng = req.body.to.location.lng;
-            }
-        }
-    }
-
     try {
+        ['active_delivery_id', 'description', 'weight'].forEach(property => {
+            updatePropertyIfNotNull(req.body, res.package, property);
+        });
+
+        if (req.body.dimensions) {
+            ['width', 'height', 'depth'].forEach(property => {
+                updatePropertyIfNotNull(req.body.dimensions, res.package.dimensions, property);
+            });
+        }
+
+        ['from', 'to'].forEach(direction => {
+            if (req.body[direction]) {
+                updatePropertyIfNotNull(req.body[direction], res.package[direction], 'name');
+                updatePropertyIfNotNull(req.body[direction], res.package[direction], 'address');
+
+                if (req.body[direction].location) {
+                    ['lat', 'lng'].forEach(coord => {
+                        updatePropertyIfNotNull(req.body[direction].location, res.package[direction].location, coord);
+                    });
+                }
+            }
+        });
+
         const updatedPackage = await res.package.save();
         res.json(updatedPackage);
     } catch (err) {
