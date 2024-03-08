@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const socketIo = require('socket.io');
 
+const Delivery = require('./models/Delivery');
 const packageRoutes = require('./routes/packages');
 const deliveryRoutes = require('./routes/deliveries');
 

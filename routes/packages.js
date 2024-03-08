@@ -35,29 +35,30 @@ async function getPackage(req, res, next) {
 }
 
 router.post('/', async (req, res) => {
-    const package = new Package({
-        package_id: req.body.package_id,
-        active_delivery_id: req.body.active_delivery_id,
-        description: req.body.description,
-        weight: req.body.weight,
-        dimensions: {
-            width: req.body.width,
-            height: req.body.height,
-            depth: req.body.depth
-        },
-        from: {
-            name: req.body.from_name,
-            address: req.body.from_address,
-            location: { lat: req.body.from_location.lat, lng: req.body.from_location.lng }
-        },
-        to: {
-            name: req.body.to_name,
-            address: req.body.to_address,
-            location: { lat: req.body.to_location.lat, lng: req.body.to_location.lng }
-        }
-    });
-
     try {
+        const package = new Package({
+            package_id: req.body.package_id,
+            active_delivery_id: req.body.active_delivery_id,
+            description: req.body.description,
+            weight: req.body.weight,
+            dimensions: {
+                width: req.body.width,
+                height: req.body.height,
+                depth: req.body.depth
+            },
+            from: {
+                name: req.body.from.name,
+                address: req.body.from.address,
+                location: { lat: req.body.from.location.lat, lng: req.body.from.location.lng }
+            },
+            to: {
+                name: req.body.to.name,
+                address: req.body.to.address,
+                location: { lat: req.body.to.location.lat, lng: req.body.to.location.lng }
+            }
+        });
+
+        console.log('Ongoing')
         const newPackage = await package.save();
         res.status(201).json(newPackage);
     } catch (err) {

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Delivery = require('../models/Delivery');
 
+const { updatePropertyIfNotNull } = require('./utils');
+
 
 router.get('/', async (req, res) => {
     try {
@@ -52,11 +54,11 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', getDelivery, async (req, res) => {
-    if (req.body.status != null) {
-        res.delivery.status = req.body.status;
-    }
-
     try {
+        ['pickup_time', 'start_time', 'end_time', 'location', 'status'].forEach(property => {
+            updatePropertyIfNotNull(req.body, res.delivery, property);
+        });
+
         const updatedDelivery = await res.delivery.save();
         res.json(updatedDelivery);
     } catch (err) {
