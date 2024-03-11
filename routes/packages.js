@@ -22,7 +22,13 @@ router.get('/:id', getPackage, (req, res) => {
 async function getPackage(req, res, next) {
     let package;
     try {
-        package = await Package.findById(req.params.id);
+        const query = {};
+        query['package_id'] = req.params.id;
+        // package = await Package.findById(req.params.id);
+        package = await Package.findOne(query);
+        if (package == null) {
+            return res.status(404).json({ message: 'Cannot find package' });
+        }
         if (package == null) {
             return res.status(404).json({ message: 'Cannot find package' });
         }

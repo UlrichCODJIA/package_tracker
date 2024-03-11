@@ -1,17 +1,4 @@
-$primary-color: #0056b3;
-$secondary-color: #003d82;
-$text-color: #333;
-$background-color: #f4f4f4;
-$card-background: #ffffff;
-$font-family: 'Roboto', sans-serif;
-
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-body {
-    font-family: $font-family;
-    color: $text-color;
-    background-color: $background-color;
-}
+@import '../../../styles.scss';
 
 .package-tracking {
     padding: 20px;

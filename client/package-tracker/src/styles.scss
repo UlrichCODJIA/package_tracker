@@ -1,10 +1,14 @@
-/* You can add global styles to this file, and also import other style files */
+$primary-color: #93C47D;
+$secondary-color: #FFC107;
+$tertiary-color: #F44336;
+$text-color: #333;
+$background-color: #D9EAD3;
+$driver-background-color: #FCE5CD;
+$card-background: #ffffff;
+$blue-color: #4c88bf;
+$orange-color: #FF9900;
+$green-color: #6AA84F;
+$red-color: #E06666;
+$font-family: 'Roboto', sans-serif;
 
-$primary-color: #5b8def;
-$secondary-color: #f47373;
-$background-color: #f4f4f4;
-
-
-body {
-    font-family: 'Roboto', sans-serif;
-}
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');

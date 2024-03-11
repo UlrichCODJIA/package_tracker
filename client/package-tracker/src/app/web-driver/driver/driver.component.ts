@@ -1,36 +1,77 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { PackageTrackerService } from '../../shared/package-tracker.service';
 import { RealTimeUpdatesService } from '../../shared/real-time-updates.service';
+import * as mapboxgl from 'mapbox-gl';
+import { environment } from '../../../environments/environment';
+import { MapboxRoutingService } from '../../shared/mapbox-routing.service';
 
+export interface MapboxRouteResponse {
+  routes: Array<{
+    geometry: {
+      coordinates: number[][];
+      type: string;
+    };
+  }>;
+}
 @Component({
   selector: 'app-driver',
   templateUrl: './driver.component.html',
   styleUrls: ['./driver.component.scss']
 })
-export class DriverComponent implements OnInit {
-  onMapReady($event: Event) {
-    throw new Error('Method not implemented.');
-  }
-  onMapClick($event: google.maps.MapMouseEvent | google.maps.IconMouseEvent) {
-    throw new Error('Method not implemented.');
-  }
+export class DriverComponent implements OnInit, AfterViewInit {
+  @ViewChild('map') mapElement!: ElementRef;
+  map!: mapboxgl.Map;
   packageData: any;
   delivery: any;
-  center: google.maps.LatLngLiteral = { lat: 0, lng: 0 };
-  markers: google.maps.Marker[] = [];
-  currentLocation: google.maps.LatLng | null = null;
+  markers: mapboxgl.Marker[] = [];
+  currentLocation: [number, number] | null = null;
   watchId: number | null = null;
-  map: any;
+  deliveryMarker: mapboxgl.Marker | null = null;
+  route: any | null = null;
 
   constructor(
     private packageTrackerService: PackageTrackerService,
-    private realTimeUpdatesService: RealTimeUpdatesService
+    private realTimeUpdatesService: RealTimeUpdatesService,
+    private mapboxRoutingService: MapboxRoutingService
   ) { }
 
   ngOnInit(): void {
     this.realTimeUpdatesService.connect();
     this.realTimeUpdatesService.onDeliveryUpdated().subscribe((delivery) => {
       this.updateDelivery(delivery);
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.initMap();
+
+    this.map.on('load', () => {
+      this.loadIcon('assets/icons/delivery.png', 'assets/icons/delivery.png');
+    });
+  }
+
+  initMap(): void {
+    this.map = new mapboxgl.Map({
+      container: this.mapElement.nativeElement,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [0, 0],
+      zoom: 10,
+      accessToken: environment.mapboxAccessToken
+    });
+  }
+
+  loadIcon(id: string, url: string): void {
+    this.map.loadImage(url, (error, image) => {
+      if (error) {
+        console.error(`An error occurred while loading the icon: ${id}`, error);
+        return;
+      }
+
+      if (image) {
+        this.map.addImage(id, image);
+      } else {
+        console.error(`Failed to load image for icon: ${id}`);
+      }
     });
   }
 
@@ -55,64 +96,130 @@ export class DriverComponent implements OnInit {
     );
   }
 
+  createCustomMarker(iconId: string): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'custom-marker';
+    el.style.backgroundImage = `url(${iconId})`;
+    el.style.width = '41px';
+    el.style.height = '41px';
+    el.style.backgroundSize = '100%';
+    return el;
+  }
+
+  addMarker(lngLat: mapboxgl.LngLatLike, iconId: string): mapboxgl.Marker {
+    const el = this.createCustomMarker(iconId);
+    const marker = new mapboxgl.Marker({ element: el })
+      .setLngLat(lngLat)
+      .setPopup(new mapboxgl.Popup().setHTML('Your Location'))
+      .addTo(this.map);
+    this.markers.push(marker);
+    return marker;
+  }
+
   updateMap(): void {
     this.clearMap();
 
-    const packageMarker = new google.maps.Marker({
-      position: this.packageData.from.location,
-      map: this.map,
-      title: 'Package Origin',
-      icon: 'assets/icons/package.png'
-    });
+    const packageMarker = new mapboxgl.Marker({
+      color: 'brown'
+    })
+      .setLngLat([this.packageData.from.location.lng, this.packageData.from.location.lat])
+      .setPopup(new mapboxgl.Popup().setHTML('Package Origin'))
+      .addTo(this.map);
     this.markers.push(packageMarker);
 
-    const destinationMarker = new google.maps.Marker({
-      position: this.packageData.to.location,
-      map: this.map,
-      title: 'Package Destination',
-      icon: 'assets/icons/destination.png'
-    });
+    const destinationMarker = new mapboxgl.Marker({
+      color: 'green'
+    })
+      .setLngLat([this.packageData.to.location.lng, this.packageData.to.location.lat])
+      .setPopup(new mapboxgl.Popup().setHTML('Package Destination'))
+      .addTo(this.map);
     this.markers.push(destinationMarker);
 
     if (this.delivery && this.delivery.location) {
-      const deliveryMarker = new google.maps.Marker({
-        position: this.delivery.location,
-        map: this.map,
-        title: 'Delivery Location',
-        icon: 'assets/icons/delivery.png'
-      });
-      this.markers.push(deliveryMarker);
+      this.createDeliveryMarker();
+      this.addRouteToMap();
 
-      const bounds = new google.maps.LatLngBounds();
-      bounds.extend(this.packageData.from.location);
-      bounds.extend(this.packageData.to.location);
-      bounds.extend(this.delivery.location);
-      this.map.fitBounds(bounds);
+      const bounds = new mapboxgl.LngLatBounds();
+      bounds.extend([this.packageData.from.location.lng, this.packageData.from.location.lat]);
+      bounds.extend([this.packageData.to.location.lng, this.packageData.to.location.lat]);
+      bounds.extend([this.delivery.location.lng, this.delivery.location.lat]);
+      this.map.fitBounds(bounds, { padding: 50 });
     } else {
-      this.center = this.packageData.from.location;
-      this.map.setCenter(this.center);
+      this.map.setCenter([this.packageData.from.location.lng, this.packageData.from.location.lat]);
       this.map.setZoom(10);
     }
   }
 
+  createDeliveryMarker(): void {
+    if (this.deliveryMarker) {
+      this.deliveryMarker.remove();
+    }
+
+    this.addMarker(this.delivery.location, 'assets/icons/delivery.png');
+  }
+
+  addRouteToMap(): void {
+    if (this.route) {
+      this.map.removeSource('route');
+      this.map.removeLayer('route');
+    }
+
+    this.mapboxRoutingService
+      .getRoute(
+        [this.packageData.from.location.lng, this.packageData.from.location.lat],
+        [this.delivery.location.lng, this.delivery.location.lat]
+      )
+      .subscribe((geometry) => {
+        this.route = geometry;
+        this.map.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: this.route
+          }
+        });
+
+        this.map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#888',
+            'line-width': 5
+          }
+        });
+      });
+  }
+
   clearMap(): void {
     for (const marker of this.markers) {
-      marker.setMap(null);
+      marker.remove();
     }
     this.markers = [];
+    if (this.deliveryMarker) {
+      this.deliveryMarker.remove();
+      this.deliveryMarker = null;
+    }
+    if (this.route) {
+      this.map.removeSource('route');
+      this.map.removeLayer('route');
+      this.route = null;
+    }
   }
 
   watchLocation(): void {
     if (navigator.geolocation) {
       this.watchId = navigator.geolocation.watchPosition(
         (position) => {
-          const currentLocation = new google.maps.LatLng(
-            position.coords.latitude,
-            position.coords.longitude
-          );
+          const currentLocation: [number, number] = [position.coords.longitude, position.coords.latitude];
 
           if (this.currentLocation) {
-            this.updateDeliveryLocation(currentLocation);
+            this.animateDeliveryMarker(this.currentLocation, currentLocation);
           }
 
           this.currentLocation = currentLocation;
@@ -131,13 +238,49 @@ export class DriverComponent implements OnInit {
     }
   }
 
-  updateDeliveryLocation(newLocation: google.maps.LatLng): void {
+  animateDeliveryMarker(from: [number, number], to: [number, number]): void {
+    if (this.deliveryMarker) {
+      const fromLngLat = new mapboxgl.LngLat(from[0], from[1]);
+      const toLngLat = new mapboxgl.LngLat(to[0], to[1]);
+
+      this.deliveryMarker.setLngLat(fromLngLat);
+
+      const animation = () => {
+        const marker = this.deliveryMarker;
+        const step = (toLngLat.lng - fromLngLat.lng) / 100;
+
+        requestAnimationFrame(() => {
+          if (!marker) {
+            return;
+          }
+
+          const currentLngLat = marker.getLngLat();
+          const newLngLat = new mapboxgl.LngLat(currentLngLat.lng + step, currentLngLat.lat);
+
+          if (newLngLat.lng >= toLngLat.lng) {
+            marker.setLngLat(toLngLat);
+            this.updateDeliveryLocation(to);
+            return;
+          }
+
+          marker.setLngLat(newLngLat);
+          animation();
+        });
+      };
+
+      animation();
+    }
+  }
+
+  updateDeliveryLocation(newLocation: [number, number]): void {
     if (this.delivery) {
       const location = {
-        lat: newLocation.lat(),
-        lng: newLocation.lng()
+        lat: newLocation[1],
+        lng: newLocation[0]
       };
       this.realTimeUpdatesService.emitLocationChanged(this.delivery.delivery_id, location);
+      this.delivery.location = location;
+      this.addRouteToMap();
     }
   }
 
@@ -150,17 +293,5 @@ export class DriverComponent implements OnInit {
     if (this.delivery) {
       this.realTimeUpdatesService.emitStatusChanged(this.delivery.delivery_id, newStatus);
     }
-  }
-
-  getIconUrl(marker: google.maps.Marker): string {
-    const icon = marker.getIcon();
-    if (typeof icon === 'object' && icon && 'url' in icon) {
-      return icon.url;
-    }
-    return '';
-  }
-
-  getMarkerScaledSize(): google.maps.Size {
-    return new google.maps.Size(30, 30);
   }
 }

@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MapboxLoaderService } from './mapbox-loader.service';
+import { MapboxRoutingService } from './mapbox-routing.service';
 
-describe('MapboxLoaderService', () => {
-  let service: MapboxLoaderService;
+describe('MapboxRoutingService', () => {
+  let service: MapboxRoutingService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(MapboxLoaderService);
+    service = TestBed.inject(MapboxRoutingService);
   });
 
   it('should be created', () => {
