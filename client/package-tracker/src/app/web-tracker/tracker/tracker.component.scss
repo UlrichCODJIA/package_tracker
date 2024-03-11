@@ -1,0 +1,93 @@
+google-map {
+    height: 400px;
+    width: 100%;
+}
+
+.tracking-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.details-container {
+    flex: 1;
+}
+
+.package-tracking {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.package-form {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.package-form input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.package-form button {
+    padding: 10px 20px;
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.package-form button:hover {
+    background-color: #003d82;
+}
+
+.package-details,
+.delivery-details {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.package-details h3,
+.delivery-details h3 {
+    margin-top: 0;
+}
+
+.map-container {
+    height: 500px;
+    flex: 1;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.marker {
+    background-color: #3bb2d0;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.origin-marker {
+    background-color: green;
+}
+
+.destination-marker {
+    background-color: red;
+}
+
+.current-marker {
+    background-color: #3bb2d0;
+}

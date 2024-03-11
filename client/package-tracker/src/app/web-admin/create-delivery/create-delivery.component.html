@@ -1,0 +1,26 @@
+<h2>Create Delivery</h2>
+
+<form>
+    <div>
+        <label>Delivery ID:</label>
+        <input type="text" [(ngModel)]="delivery.delivery_id" name="delivery_id">
+    </div>
+
+    <div>
+        <label>Package:</label>
+        <input type="text" [(ngModel)]="delivery.package_id" [matAutocomplete]="auto" name="package_id">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayPackage">
+            <mat-option *ngFor="let package of filteredPackages | async" [value]="package.package_id">
+                {{ package.package_id }} - {{ package.description }}
+            </mat-option>
+        </mat-autocomplete>
+    </div>
+
+    <div>
+        <label>Location:</label>
+        <input type="number" [(ngModel)]="delivery.location.lat" name="lat" placeholder="Latitude">
+        <input type="number" [(ngModel)]="delivery.location.lng" name="lng" placeholder="Longitude">
+    </div>
+
+    <button type="button" (click)="createDelivery()">Submit</button>
+</form>

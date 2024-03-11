@@ -1,0 +1,41 @@
+<div class="package-tracking">
+  <div class="package-form">
+    <input type="text" name="packageId" placeholder="Enter Package ID" #packageId required>
+    <button (click)="trackPackage(packageId.value)" class="track-btn">Track</button>
+  </div>
+</div>
+<div class="tracking-container">
+  <div class="details-container">
+    <div *ngIf="packageData" class="package-details">
+      <h2>Package Details</h2>
+      <p *ngIf="packageData.package_id"><strong>ID:</strong> {{ packageData.package_id }}</p>
+      <p *ngIf="packageData.description"><strong>Description:</strong> {{ packageData.description }}</p>
+      <p *ngIf="packageData.weight"><strong>Weight:</strong> {{ packageData.weight }} g</p>
+      <p *ngIf="packageData.dimensions"><strong>Dimensions:</strong> {{ packageData.dimensions.width }} x {{ packageData.dimensions.height }} x {{
+        packageData.dimensions.depth }} cm</p>
+      <p *ngIf="packageData.from"><strong>From:</strong> {{ packageData.from.name }}, {{ packageData.from.address }}</p>
+      <p *ngIf="packageData.to"><strong>To:</strong> {{ packageData.to.name }}, {{ packageData.to.address }}</p>
+    </div>
+
+    <div *ngIf="delivery" class="delivery-details">
+      <h2>Delivery Details</h2>
+      <p><strong>ID:</strong> {{ delivery.delivery_id }}</p>
+      <p><strong>Status:</strong> {{ delivery.status }}</p>
+      <p *ngIf="delivery.pickup_time"><strong>Pickup Time:</strong> {{ delivery.pickup_time | date:'medium' }}</p>
+      <p *ngIf="delivery.start_time"><strong>Start Time:</strong> {{ delivery.start_time | date:'medium' }}</p>
+      <p *ngIf="delivery.end_time"><strong>End Time:</strong> {{ delivery.end_time | date:'medium' }}</p>
+      <p *ngIf="delivery.location"><strong>Current Location:</strong> {{ delivery.location.lat }}, {{ delivery.location.lng }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="packageData && delivery" #mapContainer class="map-container">
+    <google-map height="400px" width="100%" [center]="center" [zoom]="10" (mapClick)="onMapClick($event)"
+      (mapReady)="onMapReady($event)">
+      <map-marker *ngFor="let marker of markers; let i = index" [position]="marker.getPosition() || { lat: 0, lng: 0 }"
+        [label]="marker.getTitle() || ''" [icon]="{
+          url: getIconUrl(marker),
+          scaledSize: getMarkerScaledSize()
+        }"></map-marker>
+    </google-map>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<div>
+  <input type="text" placeholder="Enter Delivery ID" #deliveryId>
+  <button (click)="loadDelivery(deliveryId.value)">Submit</button>
+</div>
+
+<div *ngIf="packageData">
+  <h2>Package Details</h2>
+  <p>ID: {{ packageData.package_id }}</p>
+  <p>Description: {{ packageData.description }}</p>
+  <p>Weight: {{ packageData.weight }} g</p>
+  <p>Dimensions: {{ packageData.dimensions.width }} x {{ packageData.dimensions.height }} x {{
+    packageData.dimensions.depth }} cm</p>
+  <p>From: {{ packageData.from.name }}, {{ packageData.from.address }}</p>
+  <p>To: {{ packageData.to.name }}, {{ packageData.to.address }}</p>
+</div>
+
+<div *ngIf="delivery">
+  <h2>Delivery Details</h2>
+  <p>ID: {{ delivery.delivery_id }}</p>
+  <p>Status: {{ delivery.status }}</p>
+  <p *ngIf="delivery.pickup_time">Pickup Time: {{ delivery.pickup_time | date:'medium' }}</p>
+  <p *ngIf="delivery.start_time">Start Time: {{ delivery.start_time | date:'medium' }}</p>
+  <p *ngIf="delivery.end_time">End Time: {{ delivery.end_time | date:'medium' }}</p>
+  <p *ngIf="delivery.location">Current Location: {{ delivery.location.lat }}, {{ delivery.location.lng }}</p>
+
+  <div>
+    <button (click)="changeStatus('picked-up')" [disabled]="delivery.status !== 'open'">Picked Up</button>
+    <button (click)="changeStatus('in-transit')" [disabled]="delivery.status !== 'picked-up'">In Transit</button>
+    <button (click)="changeStatus('delivered')" [disabled]="delivery.status !== 'in-transit'">Delivered</button>
+    <button (click)="changeStatus('failed')" [disabled]="delivery.status !== 'in-transit'">Failed</button>
+  </div>
+</div>
+
+<google-map height="400px" width="100%" [center]="center" [zoom]="10" (mapClick)="onMapClick($event)"
+  (mapReady)="onMapReady($event)">
+  <map-marker *ngFor="let marker of markers; let i = index" [position]="marker.getPosition() || { lat: 0, lng: 0 }"
+    [label]="marker.getTitle() || ''" [icon]="{
+    url: getIconUrl(marker),
+    scaledSize: getMarkerScaledSize()
+  }"></map-marker>
+</google-map>

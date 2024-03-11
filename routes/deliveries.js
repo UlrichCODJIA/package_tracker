@@ -22,7 +22,10 @@ router.get('/:id', getDelivery, (req, res) => {
 async function getDelivery(req, res, next) {
     let delivery;
     try {
-        delivery = await Delivery.findById(req.params.id);
+        const query = {};
+        query['delivery_id'] = req.params.id;
+        // delivery = await Delivery.findById(req.params.id);
+        delivery = await Delivery.findOne(query);
         if (delivery == null) {
             return res.status(404).json({ message: 'Cannot find delivery' });
         }
