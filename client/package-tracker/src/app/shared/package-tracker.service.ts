@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment.development';
+import { MapboxRouteResponse } from '../web-tracker/tracker/tracker.component'
 @Injectable({
   providedIn: 'root'
 })
@@ -48,5 +50,18 @@ export class PackageTrackerService {
 
   public deleteDelivery(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/delivery/${id}`);
+  }
+
+  public getRoute(from: [number, number], to: [number, number]): Observable<any> {
+    const mapboxDirectionsUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${from[0]},${from[1]};${to[0]},${to[1]}?geometries=geojson&overview=full&access_token=${environment.mapboxAccessToken}`;
+
+    return this.http.get<MapboxRouteResponse>(mapboxDirectionsUrl).pipe(
+      map(response => {
+        if (response.routes && response.routes.length > 0) {
+          return response.routes[0].geometry;
+        }
+        throw new Error('No route found');
+      })
+    );
   }
 }

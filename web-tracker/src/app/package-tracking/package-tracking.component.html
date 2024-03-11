@@ -1,0 +1,28 @@
+<div class="package-tracking">
+    <form (ngSubmit)="trackPackage()" class="package-form">
+        <input type="text" id="packageId" [(ngModel)]="packageId" name="packageId" placeholder="Enter Package ID" required>
+        <button type="submit" class="track-btn">Track</button>
+    </form>
+
+    <div class="tracking-container">
+        <div class="details-container">
+            <div *ngIf="packageDetails" class="package-details">
+                <h3>Package Details</h3>
+                <p><strong>Description:</strong> {{ packageDetails.description }}</p>
+                <p><strong>Weight:</strong> {{ packageDetails.weight }} grams</p>
+                <p><strong>From:</strong> {{ packageDetails.from.name }}, {{ packageDetails.from.address }}</p>
+                <p><strong>To:</strong> {{ packageDetails.to.name }}, {{ packageDetails.to.address }}</p>
+            </div>
+
+            <div *ngIf="deliveryDetails" class="delivery-details">
+                <h3>Delivery Details</h3>
+                <p><strong>Status:</strong> {{ deliveryDetails.status }}</p>
+                <p><strong>Current Location:</strong> {{ deliveryDetails.location.lat }}, {{ deliveryDetails.location.lng }}</p>
+                <p><strong>Pickup Time:</strong> {{ deliveryDetails.pickup_time | date:'medium' }}</p>
+                <p><strong>Start Time:</strong> {{ deliveryDetails.start_time | date:'medium' }}</p>
+                <p><strong>End Time:</strong> {{ deliveryDetails.end_time | date:'medium' }}</p>
+            </div>
+        </div>
+        <div *ngIf="packageDetails && deliveryDetails" #mapContainer class="map-container"></div>
+    </div>
+</div>
