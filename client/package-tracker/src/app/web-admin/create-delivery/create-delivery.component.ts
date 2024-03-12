@@ -1,75 +1,89 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { debounceTime, map, switchMap } from 'rxjs/operators';
 import { PackageTrackerService } from '../../shared/package-tracker.service';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 
+export interface Package {
+  active_delivery_id: string,
+  description: string;
+  weight: number,
+  dimensions: {
+      width: number,
+      height: number,
+      depth: number
+  },
+  from: {
+      name: string,
+      address: string,
+      location: { lat: number, lng: number }
+  },
+  to: {
+      name: string,
+      address: string,
+      location: { lat: number, lng: number }
+  }
+}
+
+export interface Delivery {
+  package_id: string;
+  status: 'open' | 'in-transit' | 'delivered';
+  location: {
+    lat: number;
+    lng: number;
+  };
+  pickup_time: string,
+  start_time: string,
+  end_time: string,
+}
 @Component({
   selector: 'app-create-delivery',
   templateUrl: './create-delivery.component.html',
   styleUrls: ['./create-delivery.component.scss']
 })
-
 export class CreateDeliveryComponent implements OnInit {
-  delivery: any = {
-    delivery_id: '',
-    package_id: '',
-    status: 'open',
-    location: {
-      lat: 0,
-      lng: 0
-    }
-  };
-  packages: any[] = [];
-  filteredPackages: Observable<any[]>;
+  deliveryForm: any;
+  filteredPackages: any;
 
   constructor(
-    private packageTrackerService: PackageTrackerService,
-    private router: Router
-  ) {
-    this.filteredPackages = new Observable<any[]>();
-  }
+    private fb: FormBuilder,
+    private packageTrackerService: PackageTrackerService
+  ) {}
 
   ngOnInit(): void {
-    this.fetchPackages();
-  }
+    this.deliveryForm = this.fb.group({
+      package_id: ['', Validators.required],
+      location: this.fb.group({
+        lat: [0, [Validators.required, Validators.min(-90), Validators.max(90)]],
+        lng: [0, [Validators.required, Validators.min(-180), Validators.max(180)]]
+      })
+    });
 
-  displayPackage(packageData: any): string {
-    return `${packageData.package_id} - ${packageData.description}`;
-  }
-
-  fetchPackages(): void {
-    this.packageTrackerService.getPackages().subscribe(
-      (packages) => {
-        this.packages = packages;
-        this.filteredPackages = this.filterPackages('');
-      },
-      (error) => {
-        console.error('Error fetching packages:', error);
-      }
+    this.filteredPackages = this.deliveryForm.get('package_id').valueChanges.pipe(
+      debounceTime(300),
+      switchMap((value: string) => this.filterPackages(value))
     );
   }
 
-  filterPackages(value: string): Observable<any[]> {
-    const filterValue = value.toLowerCase();
-    return new Observable<any[]>((observer) => {
-      const filteredPackages = this.packages.filter((p: any) =>
-        p.package_id.toLowerCase().includes(filterValue) ||
-        p.description.toLowerCase().includes(filterValue)
-      );
-      observer.next(filteredPackages);
-    });
+  filterPackages(value: string): Observable<Package[]> {
+    return this.packageTrackerService.getPackages().pipe(
+      map(packages => packages.filter((packageData: any) => packageData.package_id.toString().toLowerCase().includes(value.toLowerCase()) ||
+      packageData.description.toLowerCase().includes(value.toLowerCase())))
+    );
   }
 
   createDelivery(): void {
-    this.packageTrackerService.createDelivery(this.delivery).subscribe(
-      (newDelivery) => {
-        console.log('Delivery created:', newDelivery);
-        this.router.navigate(['/admin']);
-      },
-      (error) => {
-        console.error('Error creating delivery:', error);
-      }
-    );
+    if (this.deliveryForm.valid) {
+      const delivery: Delivery = this.deliveryForm.value;
+      this.packageTrackerService.createDelivery(delivery).subscribe(
+        response => {
+          console.log('Delivery successfully created', response);
+        },
+        error => {
+          console.error('Error creating delivery:', error);
+        }
+      );
+    } else {
+    }
   }
 }

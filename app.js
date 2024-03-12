@@ -32,7 +32,6 @@ io.on('connection', (socket) => {
         try {
             const query = {};
             query['delivery_id'] = delivery_id;
-            // const delivery = await Delivery.findById(delivery_id);
             const delivery = await Delivery.findOne(query);
             if (!delivery) {
                 socket.emit('error', 'Delivery not found');
@@ -56,7 +55,6 @@ io.on('connection', (socket) => {
             const query = {};
             query['delivery_id'] = delivery_id;
             const delivery = await Delivery.findOne(query);
-            // const delivery = await Delivery.findById(delivery_id);
             if (!delivery) {
                 socket.emit('error', 'Delivery not found');
                 return;

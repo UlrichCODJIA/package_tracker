@@ -23,8 +23,7 @@ async function getDelivery(req, res, next) {
     let delivery;
     try {
         const query = {};
-        query['delivery_id'] = req.params.id;
-        // delivery = await Delivery.findById(req.params.id);
+        query['delivery_id'] = parseInt(req.params.id);
         delivery = await Delivery.findOne(query);
         if (delivery == null) {
             return res.status(404).json({ message: 'Cannot find delivery' });
@@ -39,7 +38,6 @@ async function getDelivery(req, res, next) {
 
 router.post('/', async (req, res) => {
     const delivery = new Delivery({
-        delivery_id: req.body.delivery_id,
         package_id: req.body.package_id,
         pickup_time: req.body.pickup_time,
         start_time: req.body.start_time,

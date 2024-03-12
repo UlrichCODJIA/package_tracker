@@ -1,7 +1,7 @@
 <div class="delivery-tracking">
   <div class="delivery-form">
-    <input type="text" name="deliveryId" placeholder="Enter Delivery ID" #deliveryId required>
-    <button (click)="loadDelivery(deliveryId.value)" class="submit-btn">Track</button>
+    <input type="number" name="deliveryId" placeholder="Enter Delivery ID" #deliveryId required>
+    <button (click)="loadDelivery(+deliveryId.value)" class="submit-btn">Track</button>
   </div>
 </div>
 

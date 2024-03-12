@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '../shared/shared.module';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { WebAdminRoutingModule } from './web-admin-routing.module';
 import { WebAdminComponent } from './web-admin.component';
@@ -22,6 +23,7 @@ import { CreateDeliveryComponent } from './create-delivery/create-delivery.compo
     CommonModule,
     WebAdminRoutingModule,
     MatAutocompleteModule,
+    ReactiveFormsModule,
     FormsModule,
     SharedModule
   ]

@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 })
 export class CreatePackageComponent implements OnInit {
   packageData: any = {
-    package_id: '',
     description: '',
     weight: 0,
     dimensions: {

@@ -1,26 +1,32 @@
 <h2>Create Delivery</h2>
 
-<form>
-    <div>
-        <label>Delivery ID:</label>
-        <input type="text" [(ngModel)]="delivery.delivery_id" name="delivery_id">
-    </div>
-
-    <div>
+<form [formGroup]="deliveryForm">
+    <div class="form-group">
         <label>Package:</label>
-        <input type="text" [(ngModel)]="delivery.package_id" [matAutocomplete]="auto" name="package_id">
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayPackage">
+        <input type="text" formControlName="package_id" [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete" [panelWidth]="'400px'">
             <mat-option *ngFor="let package of filteredPackages | async" [value]="package.package_id">
-                {{ package.package_id }} - {{ package.description }}
+                {{ package.description }}
             </mat-option>
         </mat-autocomplete>
     </div>
 
-    <div>
-        <label>Location:</label>
-        <input type="number" [(ngModel)]="delivery.location.lat" name="lat" placeholder="Latitude">
-        <input type="number" [(ngModel)]="delivery.location.lng" name="lng" placeholder="Longitude">
+    <div formGroupName="location">
+        <div class="form-group">
+            <label>Latitude:</label>
+            <input type="number" formControlName="lat" required placeholder="Latitude">
+            <div *ngIf="deliveryForm.get('location.lat').errors">
+                Valid latitude is required.
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Longitude:</label>
+            <input type="number" formControlName="lng" required placeholder="Longitude">
+            <div *ngIf="deliveryForm.get('location.lng').errors">
+                Valid longitude is required.
+            </div>
+        </div>
     </div>
 
-    <button type="button" (click)="createDelivery()">Submit</button>
+    <button type="button" (click)="createDelivery()" [disabled]="deliveryForm.invalid">Submit</button>
 </form>

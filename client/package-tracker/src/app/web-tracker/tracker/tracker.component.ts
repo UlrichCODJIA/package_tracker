@@ -71,7 +71,7 @@ export class TrackerComponent implements AfterViewInit {
   }
 
 
-  trackPackage(packageId: string): void {
+  trackPackage(packageId: number): void {
     this.packageTrackerService.getPackage(packageId).subscribe(
       (packageData) => {
         this.packageData = packageData;

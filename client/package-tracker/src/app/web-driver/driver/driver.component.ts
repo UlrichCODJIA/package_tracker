@@ -75,7 +75,7 @@ export class DriverComponent implements OnInit, AfterViewInit {
     });
   }
 
-  loadDelivery(deliveryId: string): void {
+  loadDelivery(deliveryId: number): void {
     this.packageTrackerService.getDelivery(deliveryId).subscribe(
       (delivery) => {
         this.delivery = delivery;

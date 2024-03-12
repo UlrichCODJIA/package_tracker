@@ -1,7 +1,7 @@
 <div class="package-tracking">
   <div class="package-form">
-    <input type="text" name="packageId" placeholder="Enter Package ID" #packageId required>
-    <button (click)="trackPackage(packageId.value)" class="track-btn">Track</button>
+    <input type="number" name="packageId" placeholder="Enter Package ID" #packageId required>
+    <button (click)="trackPackage(+packageId.value)" class="track-btn">Track</button>
   </div>
 </div>
 <div class="tracking-container">
