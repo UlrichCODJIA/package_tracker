@@ -237,7 +237,7 @@ export class DriverComponent implements OnInit, AfterViewInit {
             },
             {
               enableHighAccuracy: true,
-              timeout: 10000,
+              timeout: 20000,
               maximumAge: 0
             }
           );
@@ -253,7 +253,7 @@ export class DriverComponent implements OnInit, AfterViewInit {
   animateMarker(start: [number, number], end: [number, number]) {
     if (this.deliveryMarker) {
       const startTime = performance.now();
-      const duration = 5000;
+      const duration = 2000;
       const marker = this.markers[this.markers.length - 1];
 
       const animate = (currentTime: number) => {
