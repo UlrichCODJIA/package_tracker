@@ -10,6 +10,7 @@ import { WebAdminComponent } from './web-admin.component';
 import { HomeComponent } from './home/home.component';
 import { CreatePackageComponent } from './create-package/create-package.component';
 import { CreateDeliveryComponent } from './create-delivery/create-delivery.component';
+import { MapSelectorComponent } from './map-selector/map-selector.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { CreateDeliveryComponent } from './create-delivery/create-delivery.compo
     WebAdminComponent,
     HomeComponent,
     CreatePackageComponent,
-    CreateDeliveryComponent
+    CreateDeliveryComponent,
+    MapSelectorComponent
   ],
   imports: [
     CommonModule,

@@ -52,8 +52,13 @@ export class PackageTrackerService {
     return this.http.delete(`${this.apiUrl}/delivery/${id}`);
   }
 
-  public getRoute(from: [number, number], to: [number, number]): Observable<any> {
-    const mapboxDirectionsUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${from[0]},${from[1]};${to[0]},${to[1]}?geometries=geojson&overview=full&access_token=${environment.mapboxAccessToken}`;
+  public getRoute(from: [number, number], to: [number, number], driver: [number, number] | null = null): Observable<any> {
+    let mapboxDirectionsUrl: string = "";
+    if (driver) {
+      mapboxDirectionsUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${driver[0]},${driver[1]};${from[0]},${from[1]};${to[0]},${to[1]}?geometries=geojson&overview=full&access_token=${environment.mapboxAccessToken}`;
+    } else {
+      mapboxDirectionsUrl = `https://api.mapbox.com/directions/v5/mapbox/driving/${from[0]},${from[1]};${to[0]},${to[1]}?geometries=geojson&overview=full&access_token=${environment.mapboxAccessToken}`;
+    }
 
     return this.http.get<MapboxRouteResponse>(mapboxDirectionsUrl).pipe(
       map(response => {

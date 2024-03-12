@@ -1,27 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { debounceTime, map, switchMap } from 'rxjs/operators';
 import { PackageTrackerService } from '../../shared/package-tracker.service';
 
 export interface Package {
+  package_id: number,
   active_delivery_id: string,
   description: string;
   weight: number,
   dimensions: {
-      width: number,
-      height: number,
-      depth: number
+    width: number,
+    height: number,
+    depth: number
   },
   from: {
-      name: string,
-      address: string,
-      location: { lat: number, lng: number }
+    name: string,
+    address: string,
+    location: { lat: number, lng: number }
   },
   to: {
-      name: string,
-      address: string,
-      location: { lat: number, lng: number }
+    name: string,
+    address: string,
+    location: { lat: number, lng: number }
   }
 }
 
@@ -67,23 +68,30 @@ export class CreateDeliveryComponent implements OnInit {
 
   filterPackages(value: string): Observable<Package[]> {
     return this.packageTrackerService.getPackages().pipe(
-      map(packages => packages.filter((packageData: any) => packageData.package_id.toString().toLowerCase().includes(value.toLowerCase()) ||
-      packageData.description.toLowerCase().includes(value.toLowerCase())))
+      map(packages => packages.filter((packageData: Package) =>
+        packageData.package_id.toString().toLowerCase().includes(value.toString().toLowerCase()) ||
+        packageData.description.toLowerCase().includes(value.toLowerCase())))
     );
+  }
+
+  onLocationSelected(location: { lat: number, lng: number }): void {
+    this.deliveryForm.patchValue({
+      location: {
+        lat: location.lat,
+        lng: location.lng
+      }
+    });
   }
 
   createDelivery(): void {
     if (this.deliveryForm.valid) {
       const delivery: Delivery = this.deliveryForm.value;
       this.packageTrackerService.createDelivery(delivery).subscribe(
-        response => {
-          console.log('Delivery successfully created', response);
-        },
-        error => {
-          console.error('Error creating delivery:', error);
-        }
+        response => console.log('Delivery successfully created', response),
+        error => console.error('Error creating delivery:', error)
       );
     } else {
+      // Handle form validation errors
     }
   }
 }

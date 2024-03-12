@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Delivery = require('../models/Delivery');
+const Package = require('../models/Package');
 
 const { updatePropertyIfNotNull } = require('./utils');
 
@@ -43,11 +44,17 @@ router.post('/', async (req, res) => {
         start_time: req.body.start_time,
         end_time: req.body.end_time,
         location: req.body.location,
-        status: req.body.status,
+        status: 'open',
     });
 
     try {
         const newDelivery = await delivery.save();
+
+        await Package.findOneAndUpdate(
+            { package_id: newDelivery.package_id },
+            { active_delivery_id: newDelivery.delivery_id }
+        );
+
         res.status(201).json(newDelivery);
     } catch (err) {
         res.status(400).json({ message: err.message });

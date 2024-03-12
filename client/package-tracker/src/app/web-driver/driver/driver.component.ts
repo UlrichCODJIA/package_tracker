@@ -161,10 +161,19 @@ export class DriverComponent implements OnInit, AfterViewInit {
       this.map.removeSource('route');
     }
 
+    let origin: [number, number] = [0, 0];
+    let destination: [number, number] = [0, 0];
+    if (this.delivery.status == "open") {
+      origin = [this.delivery.location.lng, this.delivery.location.lat];
+      destination = [this.packageData.from.location.lng, this.packageData.from.location.lat];
+    } else {
+      origin = [this.delivery.location.lng, this.delivery.location.lat];
+      destination = [this.packageData.to.location.lng, this.packageData.to.location.lat];
+    }
     this.mapboxRoutingService
       .getRoute(
-        [this.delivery.location.lng, this.delivery.location.lat],
-        [this.packageData.to.location.lng, this.packageData.to.location.lat]
+        origin,
+        destination,
       )
       .subscribe((geometry) => {
         this.route = geometry;

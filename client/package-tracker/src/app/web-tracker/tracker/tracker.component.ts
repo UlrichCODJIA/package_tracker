@@ -141,8 +141,9 @@ export class TrackerComponent implements AfterViewInit {
         this.map.fitBounds(bounds, { padding: 50 });
 
         const fromCoordinates: [number, number] = [this.packageData.from.location.lng, this.packageData.from.location.lat];
-        const toCoordinates: [number, number] = [this.packageData.to.location.lng, this.packageData.to.location.lat];
-        this.packageTrackerService.getRoute(fromCoordinates, toCoordinates).subscribe(
+        const toCoordinates: [number, number] = [this.packageData.to.location.lng, this.packageData.to.location.lat]
+        const driverCoordinates: [number, number] = [this.delivery.location.lng, this.delivery.location.lat];
+        this.packageTrackerService.getRoute(fromCoordinates, toCoordinates, driverCoordinates).subscribe(
           routeGeometry => {
             this.drawRoute(routeGeometry);
             const deliveryMarker = this.markers[this.markers.length - 1];
@@ -250,7 +251,7 @@ export class TrackerComponent implements AfterViewInit {
       this.updateMap();
 
       if (oldLocation && this.markers.length > 0) {
-        this.packageTrackerService.getRoute([oldLocation.lng, oldLocation.lat], [delivery.location.lng, delivery.location.lat]).subscribe(
+        this.packageTrackerService.getRoute([oldLocation.lng, oldLocation.lat], [delivery.location.lng, delivery.location.lat], [this.delivery.location.lng, this.delivery.location.lat]).subscribe(
           routeGeometry => {
             const deliveryMarker = this.markers[this.markers.length - 1];
             this.animateMarkerAlongRoute(deliveryMarker, routeGeometry);
