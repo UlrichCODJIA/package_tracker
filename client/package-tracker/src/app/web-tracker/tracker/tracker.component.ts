@@ -140,14 +140,18 @@ export class TrackerComponent implements AfterViewInit {
         bounds.extend(this.delivery.location);
         this.map.fitBounds(bounds, { padding: 50 });
 
-        const fromCoordinates: [number, number] = [this.packageData.from.location.lng, this.packageData.from.location.lat];
-        const toCoordinates: [number, number] = [this.packageData.to.location.lng, this.packageData.to.location.lat]
-        const driverCoordinates: [number, number] = [this.delivery.location.lng, this.delivery.location.lat];
-        this.packageTrackerService.getRoute(fromCoordinates, toCoordinates, driverCoordinates).subscribe(
+        let fromCoordinates: [number, number] = [0, 0];
+        let toCoordinates: [number, number] = [0, 0];
+        if (this.delivery.status == "open") {
+          fromCoordinates = [this.delivery.location.lng, this.delivery.location.lat];
+          toCoordinates = [this.packageData.from.location.lng, this.packageData.from.location.lat];
+        } else {
+          fromCoordinates = [this.delivery.location.lng, this.delivery.location.lat];
+          toCoordinates = [this.packageData.to.location.lng, this.packageData.to.location.lat];
+        }
+        this.packageTrackerService.getRoute(fromCoordinates, toCoordinates).subscribe(
           routeGeometry => {
             this.drawRoute(routeGeometry);
-            const deliveryMarker = this.markers[this.markers.length - 1];
-            this.animateMarkerAlongRoute(deliveryMarker, routeGeometry);
           },
           error => {
             console.error('Error fetching route:', error);
@@ -199,9 +203,9 @@ export class TrackerComponent implements AfterViewInit {
 
 
   drawRoute(routeGeometry: any): void {
-    if (this.map.getLayer('route') && this.routeSource) {
-      if (this.map.getLayer('route')) this.map.removeLayer('route');;
-      if (this.routeSource) this.map.removeSource('route');
+    if (this.map.getLayer('route') && this.map.getSource('route')) {
+      this.map.removeLayer('route');
+      this.map.removeSource('route');
       this.routeLayer = false;
       this.routeSource = false;
     }
@@ -246,21 +250,8 @@ export class TrackerComponent implements AfterViewInit {
 
   updateDelivery(delivery: any): void {
     if (this.packageData) {
-      const oldLocation = this.delivery?.location;
       this.delivery = delivery;
       this.updateMap();
-
-      if (oldLocation && this.markers.length > 0) {
-        this.packageTrackerService.getRoute([oldLocation.lng, oldLocation.lat], [delivery.location.lng, delivery.location.lat], [this.delivery.location.lng, this.delivery.location.lat]).subscribe(
-          routeGeometry => {
-            const deliveryMarker = this.markers[this.markers.length - 1];
-            this.animateMarkerAlongRoute(deliveryMarker, routeGeometry);
-          },
-          error => {
-            console.error('Error fetching route:', error);
-          }
-        );
-      }
     }
   }
 

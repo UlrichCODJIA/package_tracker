@@ -45,18 +45,19 @@ export interface Delivery {
 export class CreateDeliveryComponent implements OnInit {
   deliveryForm: any;
   filteredPackages: any;
+  showDriverMap = false;
 
   constructor(
     private fb: FormBuilder,
     private packageTrackerService: PackageTrackerService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.deliveryForm = this.fb.group({
       package_id: ['', Validators.required],
       location: this.fb.group({
-        lat: [0, [Validators.required, Validators.min(-90), Validators.max(90)]],
-        lng: [0, [Validators.required, Validators.min(-180), Validators.max(180)]]
+        lat: [{ value: 0, disabled: true }, [Validators.required, Validators.min(-90), Validators.max(90)]],
+        lng: [{ value: 0, disabled: true }, [Validators.required, Validators.min(-180), Validators.max(180)]]
       })
     });
 
@@ -74,6 +75,10 @@ export class CreateDeliveryComponent implements OnInit {
     );
   }
 
+  selectDriverLocation(): void {
+    this.showDriverMap = true;
+  }
+
   onLocationSelected(location: { lat: number, lng: number }): void {
     this.deliveryForm.patchValue({
       location: {
@@ -81,6 +86,7 @@ export class CreateDeliveryComponent implements OnInit {
         lng: location.lng
       }
     });
+    this.showDriverMap = false;
   }
 
   createDelivery(): void {
@@ -90,8 +96,6 @@ export class CreateDeliveryComponent implements OnInit {
         response => console.log('Delivery successfully created', response),
         error => console.error('Error creating delivery:', error)
       );
-    } else {
-      // Handle form validation errors
-    }
+    } else { }
   }
 }

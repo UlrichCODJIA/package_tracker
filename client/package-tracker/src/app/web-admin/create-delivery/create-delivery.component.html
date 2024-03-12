@@ -1,9 +1,9 @@
-<h2>Create Delivery</h2>
+<h2 id="title">Create Delivery</h2>
 
 <form [formGroup]="deliveryForm">
     <div class="form-group">
         <label>Package:</label>
-        <input type="text" formControlName="package_id" [matAutocomplete]="auto">
+        <input type="text" formControlName="package_id" [matAutocomplete]="auto" placeholder="Package ID or description">
         <mat-autocomplete #auto="matAutocomplete" [panelWidth]="'400px'">
             <mat-option *ngFor="let package of filteredPackages | async" [value]="package.package_id">
                 {{ package.description }}
@@ -12,23 +12,23 @@
     </div>
 
     <div formGroupName="location">
-        <h4> Choose your delivery address</h4>
-        <app-map-selector (locationSelected)="onLocationSelected($event)"></app-map-selector>
-        <div class="form-group" hidden>
+        <h4 id="location-title"> Choose your driver address</h4>
+        <button type="button" (click)="selectDriverLocation()">Click to choose driver location</button>
+        <div *ngIf="showDriverMap" class="map-modal-overlay">
+            <div class="map-modal">
+                <app-map-selector (locationSelected)="onLocationSelected($event)"></app-map-selector>
+            </div>
+        </div>
+        <div class="form-group">
             <label>Latitude:</label>
             <input type="number" formControlName="lat" required placeholder="Latitude">
-            <div *ngIf="deliveryForm.get('location.lat').errors">
-                Valid latitude is required.
-            </div>
         </div>
-        <div class="form-group" hidden>
+        <div class="form-group">
             <label>Longitude:</label>
             <input type="number" formControlName="lng" required placeholder="Longitude">
-            <div *ngIf="deliveryForm.get('location.lng').errors">
-                Valid longitude is required.
-            </div>
         </div>
     </div>
+
 
     <button type="button" (click)="createDelivery()" [disabled]="deliveryForm.invalid">Submit</button>
 </form>

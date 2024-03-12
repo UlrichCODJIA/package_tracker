@@ -33,6 +33,8 @@ export class CreatePackageComponent implements OnInit {
       }
     }
   };
+  showFromMap = false;
+  showToMap = false;
 
   constructor(
     private packageTrackerService: PackageTrackerService,
@@ -51,5 +53,23 @@ export class CreatePackageComponent implements OnInit {
         console.error('Error creating package:', error);
       }
     );
+  }
+
+  selectFromLocation(): void {
+    this.showFromMap = true;
+  }
+
+  selectToLocation(): void {
+    this.showToMap = true;
+  }
+
+  onFromLocationSelected(location: { lat: number, lng: number }): void {
+    this.packageData.from.location = location;
+    this.showFromMap = false;
+  }
+
+  onToLocationSelected(location: { lat: number, lng: number }): void {
+    this.packageData.to.location = location;
+    this.showToMap = false;
   }
 }

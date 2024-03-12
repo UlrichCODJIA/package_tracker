@@ -8,20 +8,15 @@
                 <th>Weight</th>
                 <th>From</th>
                 <th>To</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let package of packages">
-                <td>{{ package.package_id }}</td>
-                <td>{{ package.description }}</td>
-                <td>{{ package.weight }} g</td>
-                <td>{{ package.from.name }}, {{ package.from.address }}</td>
-                <td>{{ package.to.name }}, {{ package.to.address }}</td>
-                <td>
-                    <button>Edit</button>
-                    <button>Delete</button>
-                </td>
+                <td data-label="ID">{{ package.package_id }}</td>
+                <td data-label="Description">{{ package.description }}</td>
+                <td data-label="Weight">{{ package.weight }} g</td>
+                <td data-label="From">{{ package.from.name }}, {{ package.from.address }}</td>
+                <td data-label="To">{{ package.to.name }}, {{ package.to.address }}</td>
             </tr>
         </tbody>
     </table>
@@ -35,24 +30,19 @@
                 <th>ID</th>
                 <th>Package ID</th>
                 <th>Status</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let delivery of deliveries">
-                <td>{{ delivery.delivery_id }}</td>
-                <td>{{ delivery.package_id }}</td>
-                <td>{{ delivery.status }}</td>
-                <td>
-                    <button>Edit</button>
-                    <button>Delete</button>
-                </td>
+                <td data-label="ID">{{ delivery.delivery_id }}</td>
+                <td data-label="Package ID">{{ delivery.package_id }}</td>
+                <td data-label="Status">{{ delivery.status }}</td>
             </tr>
         </tbody>
     </table>
 </div>
 
-<div>
+<div class="create-btn">
     <a routerLink="/admin/create-package" class="button" routerLinkActive="active" ariaCurrentWhenActive="page">Create Package</a>
     <a routerLink="/admin/create-delivery" class="button" routerLinkActive="active" ariaCurrentWhenActive="page">Create Delivery</a>
 </div>

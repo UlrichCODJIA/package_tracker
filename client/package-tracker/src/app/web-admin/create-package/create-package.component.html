@@ -1,4 +1,4 @@
-<h2>Create Package</h2>
+<h2 id="title">Create Package</h2>
 
 <form>
     <div>
@@ -22,16 +22,30 @@
         <label>From:</label>
         <input type="text" [(ngModel)]="packageData.from.name" name="from_name" placeholder="Name">
         <input type="text" [(ngModel)]="packageData.from.address" name="from_address" placeholder="Address">
-        <input type="number" [(ngModel)]="packageData.from.location.lat" name="from_lat" placeholder="Latitude">
-        <input type="number" [(ngModel)]="packageData.from.location.lng" name="from_lng" placeholder="Longitude">
+        <button type="button" (click)="selectFromLocation()">Click to choose pick-up location</button>
+        <div *ngIf="showFromMap" class="map-modal-overlay">
+            <div class="map-modal">
+                <app-map-selector (locationSelected)="onFromLocationSelected($event)"></app-map-selector>
+            </div>
+        </div>
+        <input type="number" [(ngModel)]="packageData.from.location.lat" name="from_lat" placeholder="Latitude" disabled="">
+        <input type="number" [(ngModel)]="packageData.from.location.lng" name="from_lng" placeholder="Longitude" disabled="">
+
     </div>
 
     <div>
         <label>To:</label>
         <input type="text" [(ngModel)]="packageData.to.name" name="to_name" placeholder="Name">
         <input type="text" [(ngModel)]="packageData.to.address" name="to_address" placeholder="Address">
+        <button type="button" (click)="selectToLocation()">Click to choose delivery location</button>
+        <div *ngIf="showToMap" class="map-modal-overlay">
+            <div class="map-modal">
+                <app-map-selector (locationSelected)="onToLocationSelected($event)"></app-map-selector>
+            </div>
+        </div>
         <input type="number" [(ngModel)]="packageData.to.location.lat" name="to_lat" placeholder="Latitude">
         <input type="number" [(ngModel)]="packageData.to.location.lng" name="to_lng" placeholder="Longitude">
+
     </div>
 
     <button type="button" (click)="createPackage()">Submit</button>
