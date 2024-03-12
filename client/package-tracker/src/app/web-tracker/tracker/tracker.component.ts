@@ -145,6 +145,8 @@ export class TrackerComponent implements AfterViewInit {
         this.packageTrackerService.getRoute(fromCoordinates, toCoordinates).subscribe(
           routeGeometry => {
             this.drawRoute(routeGeometry);
+            const deliveryMarker = this.markers[this.markers.length - 1];
+            this.animateMarkerAlongRoute(deliveryMarker, routeGeometry);
           },
           error => {
             console.error('Error fetching route:', error);
@@ -157,9 +159,27 @@ export class TrackerComponent implements AfterViewInit {
     }
   }
 
+  animateMarkerAlongRoute(marker: mapboxgl.Marker, routeGeometry: any): void {
+    const route = routeGeometry.coordinates;
+    let currentPosition = 0;
+
+    const animate = () => {
+      const nextPosition = currentPosition + 1;
+      if (nextPosition < route.length) {
+        const start = route[currentPosition];
+        const end = route[nextPosition];
+        this.animateMarker(marker, start, end);
+        currentPosition = nextPosition;
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }
+
   animateMarker(marker: mapboxgl.Marker, start: [number, number], end: [number, number]) {
     const startTime = performance.now();
-    const duration = 2000;
+    const duration = 50;
 
     const animate = (currentTime: number) => {
       const t = Math.min((currentTime - startTime) / duration, 1);
@@ -224,13 +244,22 @@ export class TrackerComponent implements AfterViewInit {
   }
 
   updateDelivery(delivery: any): void {
-    const oldLocation = this.delivery?.location;
-    this.delivery = delivery;
-    this.updateMap();
+    if (this.packageData) {
+      const oldLocation = this.delivery?.location;
+      this.delivery = delivery;
+      this.updateMap();
 
-    if (oldLocation && this.markers.length > 0) {
-      const deliveryMarker = this.markers[this.markers.length - 1];
-      this.animateMarker(deliveryMarker, [oldLocation.lng, oldLocation.lat], [delivery.location.lng, delivery.location.lat]);
+      if (oldLocation && this.markers.length > 0) {
+        this.packageTrackerService.getRoute([oldLocation.lng, oldLocation.lat], [delivery.location.lng, delivery.location.lat]).subscribe(
+          routeGeometry => {
+            const deliveryMarker = this.markers[this.markers.length - 1];
+            this.animateMarkerAlongRoute(deliveryMarker, routeGeometry);
+          },
+          error => {
+            console.error('Error fetching route:', error);
+          }
+        );
+      }
     }
   }
 

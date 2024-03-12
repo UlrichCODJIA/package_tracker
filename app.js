@@ -26,10 +26,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on('location_changed', async (data) => {
+        console.log("location changed event !!!\nWe have: ", data);
         const { delivery_id, newLocation } = data;
 
         try {
-            const delivery = await Delivery.findById(delivery_id);
+            const query = {};
+            query['delivery_id'] = delivery_id;
+            // const delivery = await Delivery.findById(delivery_id);
+            const delivery = await Delivery.findOne(query);
             if (!delivery) {
                 socket.emit('error', 'Delivery not found');
                 return;
@@ -49,7 +53,10 @@ io.on('connection', (socket) => {
         const { delivery_id, newStatus } = data;
 
         try {
-            const delivery = await Delivery.findById(delivery_id);
+            const query = {};
+            query['delivery_id'] = delivery_id;
+            const delivery = await Delivery.findOne(query);
+            // const delivery = await Delivery.findById(delivery_id);
             if (!delivery) {
                 socket.emit('error', 'Delivery not found');
                 return;

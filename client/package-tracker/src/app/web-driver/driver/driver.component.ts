@@ -26,7 +26,7 @@ export class DriverComponent implements OnInit, AfterViewInit {
   markers: mapboxgl.Marker[] = [];
   currentLocation: [number, number] | null = null;
   watchId: number | null = null;
-  deliveryMarker: mapboxgl.Marker | null = null;
+  deliveryMarker: boolean = false;
   route: any | null = null;
 
   constructor(
@@ -113,6 +113,7 @@ export class DriverComponent implements OnInit, AfterViewInit {
       .setPopup(new mapboxgl.Popup().setHTML('Your Location'))
       .addTo(this.map);
     this.markers.push(marker);
+    this.deliveryMarker = true;
     return marker;
   }
 
@@ -151,23 +152,19 @@ export class DriverComponent implements OnInit, AfterViewInit {
   }
 
   createDeliveryMarker(): void {
-    if (this.deliveryMarker) {
-      this.deliveryMarker.remove();
-    }
-
     this.addMarker(this.delivery.location, 'assets/icons/delivery.png');
   }
 
   addRouteToMap(): void {
     if (this.route) {
-      this.map.removeSource('route');
       this.map.removeLayer('route');
+      this.map.removeSource('route');
     }
 
     this.mapboxRoutingService
       .getRoute(
-        [this.packageData.from.location.lng, this.packageData.from.location.lat],
-        [this.delivery.location.lng, this.delivery.location.lat]
+        [this.delivery.location.lng, this.delivery.location.lat],
+        [this.packageData.to.location.lng, this.packageData.to.location.lat]
       )
       .subscribe((geometry) => {
         this.route = geometry;
@@ -202,73 +199,67 @@ export class DriverComponent implements OnInit, AfterViewInit {
     }
     this.markers = [];
     if (this.deliveryMarker) {
-      this.deliveryMarker.remove();
-      this.deliveryMarker = null;
+      this.deliveryMarker = false;
     }
     if (this.route) {
-      this.map.removeSource('route');
       this.map.removeLayer('route');
+      this.map.removeSource('route');
       this.route = null;
     }
   }
 
   watchLocation(): void {
     if (navigator.geolocation) {
-      this.watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const currentLocation: [number, number] = [position.coords.longitude, position.coords.latitude];
+      navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus: PermissionStatus) => {
+        if (permissionStatus.state === 'granted') {
+          this.watchId = navigator.geolocation.watchPosition(
+            (position) => {
+              const currentLocation: [number, number] = [position.coords.longitude, position.coords.latitude];
 
-          if (this.currentLocation) {
-            this.animateDeliveryMarker(this.currentLocation, currentLocation);
-          }
+              if (this.currentLocation) {
+                this.animateMarker(this.currentLocation, currentLocation);
+              }
+              this.updateDeliveryLocation(currentLocation);
 
-          this.currentLocation = currentLocation;
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
+              this.currentLocation = currentLocation;
+            },
+            (error) => {
+              console.error('Error getting location:', error);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            }
+          );
+        } else {
+          console.error('Geolocation permission not granted');
         }
-      );
+      })
     } else {
       console.error('Geolocation is not supported by this browser.');
     }
   }
 
-  animateDeliveryMarker(from: [number, number], to: [number, number]): void {
+  animateMarker(start: [number, number], end: [number, number]) {
     if (this.deliveryMarker) {
-      const fromLngLat = new mapboxgl.LngLat(from[0], from[1]);
-      const toLngLat = new mapboxgl.LngLat(to[0], to[1]);
+      const startTime = performance.now();
+      const duration = 5000;
+      const marker = this.markers[this.markers.length - 1];
 
-      this.deliveryMarker.setLngLat(fromLngLat);
-
-      const animation = () => {
-        const marker = this.deliveryMarker;
-        const step = (toLngLat.lng - fromLngLat.lng) / 100;
-
-        requestAnimationFrame(() => {
-          if (!marker) {
-            return;
-          }
-
-          const currentLngLat = marker.getLngLat();
-          const newLngLat = new mapboxgl.LngLat(currentLngLat.lng + step, currentLngLat.lat);
-
-          if (newLngLat.lng >= toLngLat.lng) {
-            marker.setLngLat(toLngLat);
-            this.updateDeliveryLocation(to);
-            return;
-          }
-
-          marker.setLngLat(newLngLat);
-          animation();
-        });
+      const animate = (currentTime: number) => {
+        const t = Math.min((currentTime - startTime) / duration, 1);
+        const interpolated: [number, number] = [
+          start[0] + (end[0] - start[0]) * t,
+          start[1] + (end[1] - start[1]) * t
+        ];
+        marker.setLngLat(interpolated);
+        if (t < 1) {
+          requestAnimationFrame(animate);
+        }
       };
 
-      animation();
+      requestAnimationFrame(animate);
     }
   }
 
@@ -280,13 +271,14 @@ export class DriverComponent implements OnInit, AfterViewInit {
       };
       this.realTimeUpdatesService.emitLocationChanged(this.delivery.delivery_id, location);
       this.delivery.location = location;
-      this.addRouteToMap();
     }
   }
 
   updateDelivery(delivery: any): void {
-    this.delivery = delivery;
-    this.updateMap();
+    if (this.packageData) {
+      this.delivery = delivery;
+      this.updateMap();
+    }
   }
 
   changeStatus(newStatus: string): void {
