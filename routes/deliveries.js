@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Delivery = require('../models/Delivery');
+const Package = require('../models/Package');
 
 const { updatePropertyIfNotNull } = require('./utils');
 
@@ -22,7 +23,9 @@ router.get('/:id', getDelivery, (req, res) => {
 async function getDelivery(req, res, next) {
     let delivery;
     try {
-        delivery = await Delivery.findById(req.params.id);
+        const query = {};
+        query['delivery_id'] = parseInt(req.params.id);
+        delivery = await Delivery.findOne(query);
         if (delivery == null) {
             return res.status(404).json({ message: 'Cannot find delivery' });
         }
@@ -36,17 +39,22 @@ async function getDelivery(req, res, next) {
 
 router.post('/', async (req, res) => {
     const delivery = new Delivery({
-        delivery_id: req.body.delivery_id,
         package_id: req.body.package_id,
         pickup_time: req.body.pickup_time,
         start_time: req.body.start_time,
         end_time: req.body.end_time,
         location: req.body.location,
-        status: req.body.status,
+        status: 'open',
     });
 
     try {
         const newDelivery = await delivery.save();
+
+        await Package.findOneAndUpdate(
+            { package_id: newDelivery.package_id },
+            { active_delivery_id: newDelivery.delivery_id }
+        );
+
         res.status(201).json(newDelivery);
     } catch (err) {
         res.status(400).json({ message: err.message });

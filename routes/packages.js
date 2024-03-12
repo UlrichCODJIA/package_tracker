@@ -22,7 +22,12 @@ router.get('/:id', getPackage, (req, res) => {
 async function getPackage(req, res, next) {
     let package;
     try {
-        package = await Package.findById(req.params.id);
+        const query = {};
+        query['package_id'] = parseInt(req.params.id);
+        package = await Package.findOne(query);
+        if (package == null) {
+            return res.status(404).json({ message: 'Cannot find package' });
+        }
         if (package == null) {
             return res.status(404).json({ message: 'Cannot find package' });
         }
@@ -37,14 +42,13 @@ async function getPackage(req, res, next) {
 router.post('/', async (req, res) => {
     try {
         const package = new Package({
-            package_id: req.body.package_id,
             active_delivery_id: req.body.active_delivery_id,
             description: req.body.description,
             weight: req.body.weight,
             dimensions: {
-                width: req.body.width,
-                height: req.body.height,
-                depth: req.body.depth
+                width: req.body.dimensions.width,
+                height: req.body.dimensions.height,
+                depth: req.body.dimensions.depth
             },
             from: {
                 name: req.body.from.name,
@@ -58,7 +62,6 @@ router.post('/', async (req, res) => {
             }
         });
 
-        console.log('Ongoing')
         const newPackage = await package.save();
         res.status(201).json(newPackage);
     } catch (err) {

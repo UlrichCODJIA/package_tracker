@@ -1,0 +1,30 @@
+<div class="package-tracking">
+  <div class="package-form">
+    <input type="number" name="packageId" placeholder="Enter Package ID" #packageId required>
+    <button (click)="trackPackage(+packageId.value)" class="track-btn">Track</button>
+  </div>
+</div>
+<div class="tracking-container">
+  <div class="details-container">
+    <div *ngIf="packageData" class="package-details card">
+      <h2>Package Details</h2>
+      <p *ngIf="packageData.description"><strong>Description:</strong> {{ packageData.description }}</p>
+      <p *ngIf="packageData.weight"><strong>Weight:</strong> {{ packageData.weight }} g</p>
+      <p *ngIf="packageData.dimensions"><strong>Dimensions:</strong> {{ packageData.dimensions.width }} x {{ packageData.dimensions.height }} x {{
+        packageData.dimensions.depth }} cm</p>
+      <p *ngIf="packageData.from"><strong>From:</strong> {{ packageData.from.name }}, {{ packageData.from.address }}</p>
+      <p *ngIf="packageData.to"><strong>To:</strong> {{ packageData.to.name }}, {{ packageData.to.address }}</p>
+    </div>
+
+    <div *ngIf="delivery" class="delivery-details card">
+      <h2>Delivery Details</h2>
+      <p><strong>Status:</strong> {{ delivery.status }}</p>
+      <p *ngIf="delivery.pickup_time"><strong>Pickup Time:</strong> {{ delivery.pickup_time | date:'medium' }}</p>
+      <p *ngIf="delivery.start_time"><strong>Start Time:</strong> {{ delivery.start_time | date:'medium' }}</p>
+      <p *ngIf="delivery.end_time"><strong>End Time:</strong> {{ delivery.end_time | date:'medium' }}</p>
+      <p *ngIf="delivery.location"><strong>Current Location:</strong> {{ delivery.location.lat }}, {{ delivery.location.lng }}</p>
+    </div>
+  </div>
+
+  <div #map class="map-container" [ngStyle]="{'visibility': delivery ? 'visible' : 'hidden'}"></div>
+</div>

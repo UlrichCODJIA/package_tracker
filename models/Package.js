@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
+const MongooseSequence = require('mongoose-sequence');
+
+const AutoIncrement = MongooseSequence(mongoose);
 const Schema = mongoose.Schema;
 
 const PackageSchema = new Schema({
-    package_id: { type: String, required: true },
+    package_id: { type: Number, unique: true },
     active_delivery_id: String,
     description: String,
     weight: Number,
@@ -23,4 +26,5 @@ const PackageSchema = new Schema({
     }
 });
 
+PackageSchema.plugin(AutoIncrement, { inc_field: 'package_id' });
 module.exports = mongoose.model('Package', PackageSchema);

@@ -1,0 +1,48 @@
+<div>
+    <h2>Package List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Weight</th>
+                <th>From</th>
+                <th>To</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let package of packages">
+                <td data-label="ID">{{ package.package_id }}</td>
+                <td data-label="Description">{{ package.description }}</td>
+                <td data-label="Weight">{{ package.weight }} g</td>
+                <td data-label="From">{{ package.from.name }}, {{ package.from.address }}</td>
+                <td data-label="To">{{ package.to.name }}, {{ package.to.address }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h2>Delivery List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Package ID</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let delivery of deliveries">
+                <td data-label="ID">{{ delivery.delivery_id }}</td>
+                <td data-label="Package ID">{{ delivery.package_id }}</td>
+                <td data-label="Status">{{ delivery.status }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="create-btn">
+    <a routerLink="/admin/create-package" class="button" routerLinkActive="active" ariaCurrentWhenActive="page">Create Package</a>
+    <a routerLink="/admin/create-delivery" class="button" routerLinkActive="active" ariaCurrentWhenActive="page">Create Delivery</a>
+</div>
