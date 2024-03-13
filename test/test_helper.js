@@ -22,12 +22,7 @@ module.exports.connect = async () => {
         await mongoose.connection.close();
     }
 
-    const mongooseOpts = {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    };
-
-    await mongoose.connect(uri, mongooseOpts);
+    await mongoose.connect(uri);
 };
 
 /**
