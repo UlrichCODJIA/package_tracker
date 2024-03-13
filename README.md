@@ -9,6 +9,7 @@
 </p>
 <p align="center">
 	<a href="https://github.com/UlrichCODJIA/package_tracker/actions/workflows/node.js.yml"><img src="https://github.com/UlrichCODJIA/package_tracker/actions/workflows/node.js.yml/badge.svg" alt="license"></a>
+	<a href="[https://github.com/UlrichCODJIA/package_tracker/actions/workflows/node.js.yml](https://codecov.io/gh/UlrichCODJIA/package_tracker)"><img src="https://codecov.io/gh/UlrichCODJIA/package_tracker/graph/badge.svg?token=SJQYJJXR35" alt="codecov"></a>
 	<img src="https://img.shields.io/github/license/UlrichCODJIA/package_tracker?style=default&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
 	<img src="https://img.shields.io/github/last-commit/UlrichCODJIA/package_tracker?style=default&logo=git&logoColor=white&color=0080ff" alt="last-commit">
 	<img src="https://img.shields.io/github/languages/top/UlrichCODJIA/package_tracker?style=default&color=#02c3a7" alt="repo-top-language">
