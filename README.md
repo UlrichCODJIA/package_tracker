@@ -291,14 +291,12 @@
 > ```console
 > $ cd package_tracker
 > ```
->
 > 3. Install the dependencies:
 > ```console
 > $ npm install
 > ```
 > 4. Ensure MongoDB is running. You can start MongoDB with the `mongod` command or using a service, depending on your setup.
 > 5. Configure your database connection in the `app.js` file.
-> 6. Start the Node.js application with `node app.js` command.
 > 7. Open another terminal and change to the client directory:
 > ```console
 > $ cd client/package-tracker
@@ -307,17 +305,22 @@
 > ```console
 > $ npm install
 > ```
-> 9. Start the Angular application with `ng serve` command.
-> 10. Once the Angular application is running, it should be accessible via a browser at a URL like [http://localhost:4200](http://localhost:4200)
 
 ###  Usage
 
 <h4>From <code>source</code></h4>
 
-> Run package_tracker using the command below:
+> 1. Change to the project directory:
 > ```console
-> $ npm run build && node app.js
+> $ cd package_tracker
 > ```
+> 2. Start the package_tracker Node.js application with `node app.js` command.
+> 3. Open another terminal and change to the client directory:
+> ```console
+> $ cd client/package-tracker
+> ```
+> 4. Start the Angular application with `ng serve` command.
+> 5. Once the Angular application is running, it should be accessible via a browser at a URL like [http://localhost:4200](http://localhost:4200)
 
 ###  Tests
 
