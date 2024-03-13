@@ -8,9 +8,10 @@
     <em>Package Tracker is a web application suite designed for package tracking and delivery management.</em>
 </p>
 <p align="center">
+	<a href="https://github.com/UlrichCODJIA/package_tracker/actions/workflows/node.js.yml"><img src="https://github.com/UlrichCODJIA/package_tracker/actions/workflows/node.js.yml/badge.svg" alt="license"></a>
 	<img src="https://img.shields.io/github/license/UlrichCODJIA/package_tracker?style=default&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
 	<img src="https://img.shields.io/github/last-commit/UlrichCODJIA/package_tracker?style=default&logo=git&logoColor=white&color=0080ff" alt="last-commit">
-	<img src="https://img.shields.io/github/languages/top/UlrichCODJIA/package_tracker?style=default&color=0080ff" alt="repo-top-language">
+	<img src="https://img.shields.io/github/languages/top/UlrichCODJIA/package_tracker?style=default&color=#02c3a7" alt="repo-top-language">
 	<img src="https://img.shields.io/github/languages/count/UlrichCODJIA/package_tracker?style=default&color=0080ff" alt="repo-language-count">
 <p>
 <p align="center">
