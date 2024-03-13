@@ -150,7 +150,6 @@ describe('Packages', () => {
             .delete('/api/package/' + newPackage.package_id)
             .end((err, res) => {
                 if (err) console.log(err);
-                console.log(res.body);
 
                 res.should.have.status(200);
                 res.body.should.be.a('object');
