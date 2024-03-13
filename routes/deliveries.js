@@ -76,7 +76,7 @@ router.put('/:id', getDelivery, async (req, res) => {
 
 router.delete('/:id', getDelivery, async (req, res) => {
     try {
-        await res.delivery.remove();
+        await Delivery.deleteOne({ delivery_id: res.delivery.delivery_id });
         res.json({ message: 'Deleted Delivery' });
     } catch (err) {
         res.status(500).json({ message: err.message });
