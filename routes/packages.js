@@ -20,23 +20,18 @@ router.get('/:id', getPackage, (req, res) => {
 
 // Middleware to get a package by ID
 async function getPackage(req, res, next) {
-    let package;
     try {
         const query = {};
         query['package_id'] = parseInt(req.params.id);
-        package = await Package.findOne(query);
-        if (package == null) {
+        let package = await Package.findOne(query);
+        if (!package || package == null) {
             return res.status(404).json({ message: 'Cannot find package' });
         }
-        if (package == null) {
-            return res.status(404).json({ message: 'Cannot find package' });
-        }
+        res.package = package;
+        next();
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
-
-    res.package = package;
-    next();
 }
 
 router.post('/', async (req, res) => {
@@ -86,10 +81,10 @@ router.put('/:id', getPackage, async (req, res) => {
 
 router.delete('/:id', getPackage, async (req, res) => {
     try {
-        await res.package.remove();
+        await Package.deleteOne({ package_id: res.package.package_id });
         res.json({ message: 'Deleted Package' });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: err.message});
     }
 });
 
