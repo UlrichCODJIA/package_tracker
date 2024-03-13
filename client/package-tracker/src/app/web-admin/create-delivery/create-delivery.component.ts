@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { debounceTime, map, switchMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { PackageTrackerService } from '../../shared/package-tracker.service';
 
 export interface Package {
@@ -48,6 +49,7 @@ export class CreateDeliveryComponent implements OnInit {
   showDriverMap = false;
 
   constructor(
+    private router: Router,
     private fb: FormBuilder,
     private packageTrackerService: PackageTrackerService
   ) { }
@@ -91,9 +93,12 @@ export class CreateDeliveryComponent implements OnInit {
 
   createDelivery(): void {
     if (this.deliveryForm.valid) {
-      const delivery: Delivery = this.deliveryForm.value;
+      const delivery: Delivery = this.deliveryForm.getRawValue();
       this.packageTrackerService.createDelivery(delivery).subscribe(
-        response => console.log('Delivery successfully created', response),
+        response => {
+          console.log('Delivery successfully created', response);
+          this.router.navigate(['/admin']);
+        },
         error => console.error('Error creating delivery:', error)
       );
     } else { }
